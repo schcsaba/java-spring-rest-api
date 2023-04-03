@@ -39,3 +39,5 @@ out/
 logs_application
 dirname_IS_UNDEFINED
 logs
+
+src/main/resources/application.properties
