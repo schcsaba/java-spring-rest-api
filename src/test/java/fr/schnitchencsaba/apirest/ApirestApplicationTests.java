@@ -23,7 +23,7 @@ class ApirestApplicationTests {
     }
 
     @Test
-    void helloWorld() throws Exception {
+    void testHelloWorld() throws Exception {
         mockMvc.perform(
                         MockMvcRequestBuilders
                                 .get("/api/hello/world")
