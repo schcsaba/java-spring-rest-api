@@ -1,7 +1,6 @@
 package fr.schnitchencsaba.apirest;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -25,7 +24,7 @@ class ApirestApplicationTests {
     @Autowired
     private MockMvc mockMvc;
 
-    @PersistenceContext
+    @Autowired
     private EntityManager entityManager;
 
     private final Logger logger = LoggerFactory.getLogger(ApirestApplicationTests.class);

@@ -2,7 +2,6 @@ package fr.schnitchencsaba.apirest.database;
 
 import fr.schnitchencsaba.apirest.feature.database.DatabaseService;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class DatabaseTests {
 
-    @PersistenceContext
+    @Autowired
     private EntityManager entityManager;
 
     @Autowired
