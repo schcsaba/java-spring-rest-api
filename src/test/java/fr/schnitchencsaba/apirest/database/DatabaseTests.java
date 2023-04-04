@@ -1,6 +1,8 @@
 package fr.schnitchencsaba.apirest.database;
 
 import fr.schnitchencsaba.apirest.feature.database.DatabaseService;
+import fr.schnitchencsaba.apirest.feature.database.ProductDto;
+import fr.schnitchencsaba.apirest.feature.database.ProductDtoExtended;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
@@ -29,16 +31,16 @@ public class DatabaseTests {
 
     @Test
     void testGetProductNameList() {
-        Query query = entityManager.createNativeQuery("SELECT name from products;", Tuple.class);
-        List<Tuple> productNameList1 = ((List<Tuple>) query.getResultList());
-        List<Tuple> productNameList2 = databaseService.getProductNameList();
+        Query query = entityManager.createNativeQuery("SELECT name from products;");
+        List<String> productNameList1 = ((List<String>) query.getResultList());
+        List<String> productNameList2 = databaseService.getProductNameList();
         assert productNameList1 != null;
         assert productNameList2 != null;
         assert productNameList1.size() == productNameList2.size();
         logger.info("The sizes of the product name lists are equal.");
         for (int i = 0; i < productNameList1.size(); i++) {
-            String productName1 = (String) productNameList1.get(i).get(0);
-            String productName2 = (String) productNameList2.get(i).get(0);
+            String productName1 = productNameList1.get(i);
+            String productName2 = productNameList2.get(i);
             assertEquals(productName1, productName2);
         }
         logger.info("The names of the products are equal.");
@@ -47,21 +49,20 @@ public class DatabaseTests {
     @Test
     void testGetProductList() {
         Query query = entityManager.createNativeQuery("SELECT id, name, description from products;", Tuple.class);
-        List<Tuple> productList1 = ((List<Tuple>) query.getResultList());
-        List<Tuple> productList2 = databaseService.getProductList();
-        assert productList1 != null;
-        assert productList2 != null;
+        List<Tuple> resultList = query.getResultList();
+        List<ProductDto> productList1 = resultList.stream().map(ProductDto::new).toList();
+        List<ProductDto> productList2 = databaseService.getProductList();
         assert productList1.size() == productList2.size();
         logger.info("The sizes of the product lists are equal.");
         for (int i = 0; i < productList1.size(); i++) {
-            int productId1 = (int) productList1.get(i).get(0);
-            int productId2 = (int) productList2.get(i).get(0);
+            int productId1 = productList1.get(i).getId();
+            int productId2 = productList2.get(i).getId();
             assertEquals(productId1, productId2);
-            String productName1 = (String) productList1.get(i).get(1);
-            String productName2 = (String) productList2.get(i).get(1);
+            String productName1 = productList1.get(i).getName();
+            String productName2 = productList2.get(i).getName();
             assertEquals(productName1, productName2);
-            String productDescription1 = (String) productList1.get(i).get(2);
-            String productDescription2 = (String) productList2.get(i).get(2);
+            String productDescription1 = productList1.get(i).getDescription();
+            String productDescription2 = productList2.get(i).getDescription();
             assertEquals(productDescription1, productDescription2);
         }
         logger.info("The ids, names and descriptions of the products are equal.");
@@ -70,33 +71,32 @@ public class DatabaseTests {
     @Test
     void testGetProductListExtended() {
         Query query = entityManager.createNativeQuery("SELECT p.id, p.name, p.description, p.price, c.name, count(r.review) review_count, AVG(r.rating) average_rating FROM products p INNER JOIN categories c ON p.category_id = c.id INNER JOIN reviews r ON p.id = r.product_id GROUP BY p.id;", Tuple.class);
-        List<Tuple> productList1 = ((List<Tuple>) query.getResultList());
-        List<Tuple> productList2 = databaseService.getProductListExtended();
-        assert productList1 != null;
-        assert productList2 != null;
+        List<Tuple> resultList = query.getResultList();
+        List<ProductDtoExtended> productList1 = resultList.stream().map(ProductDtoExtended::new).toList();
+        List<ProductDtoExtended> productList2 = databaseService.getProductListExtended();
         assert productList1.size() == productList2.size();
         logger.info("The sizes of the product lists are equal.");
         for (int i = 0; i < productList1.size(); i++) {
-            int productId1 = (int) productList1.get(i).get(0);
-            int productId2 = (int) productList2.get(i).get(0);
+            int productId1 = productList1.get(i).getId();
+            int productId2 = productList2.get(i).getId();
             assertEquals(productId1, productId2);
-            String productName1 = (String) productList1.get(i).get(1);
-            String productName2 = (String) productList2.get(i).get(1);
+            String productName1 = productList1.get(i).getName();
+            String productName2 = productList2.get(i).getName();
             assertEquals(productName1, productName2);
-            String productDescription1 = (String) productList1.get(i).get(2);
-            String productDescription2 = (String) productList2.get(i).get(2);
+            String productDescription1 = productList1.get(i).getDescription();
+            String productDescription2 = productList2.get(i).getDescription();
             assertEquals(productDescription1, productDescription2);
-            int productPrice1 = (int) productList1.get(i).get(3);
-            int productPrice2 = (int) productList2.get(i).get(3);
+            int productPrice1 = productList1.get(i).getPrice();
+            int productPrice2 = productList2.get(i).getPrice();
             assertEquals(productPrice1, productPrice2);
-            String categoryName1 = Optional.ofNullable((String) productList1.get(i).get(4)).orElse("DEFAULT");
-            String categoryName2 = Optional.ofNullable((String) productList2.get(i).get(4)).orElse("DEFAULT");
+            String categoryName1 = Optional.ofNullable(productList1.get(i).getCategoryName()).orElse("DEFAULT");
+            String categoryName2 = Optional.ofNullable(productList2.get(i).getCategoryName()).orElse("DEFAULT");
             assertEquals(categoryName1, categoryName2);
-            Long reviewCount1 = (Long) productList1.get(i).get(5);
-            Long reviewCount2 = (Long) productList2.get(i).get(5);
+            Long reviewCount1 = productList1.get(i).getReviewCount();
+            Long reviewCount2 = productList2.get(i).getReviewCount();
             assertEquals(reviewCount1, reviewCount2);
-            BigDecimal averageRating1 = (BigDecimal) productList1.get(i).toArray()[6];
-            BigDecimal averageRating2 = (BigDecimal) productList2.get(i).toArray()[6];
+            BigDecimal averageRating1 = productList1.get(i).getAverageRating();
+            BigDecimal averageRating2 = productList2.get(i).getAverageRating();
             assertEquals(averageRating1, averageRating2);
         }
         logger.info("The ids, names, descriptions, prices, category names, review counts and average ratings of the products are equal.");
