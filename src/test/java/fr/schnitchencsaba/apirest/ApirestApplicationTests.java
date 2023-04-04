@@ -1,6 +1,5 @@
 package fr.schnitchencsaba.apirest;
 
-import fr.schnitchencsaba.apirest.feature.hello.HelloController;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -29,7 +28,7 @@ class ApirestApplicationTests {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private final Logger logger = LoggerFactory.getLogger(HelloController.class);
+    private final Logger logger = LoggerFactory.getLogger(ApirestApplicationTests.class);
 
     @Test
     void contextLoads() {
