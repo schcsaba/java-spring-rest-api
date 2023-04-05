@@ -1,11 +1,10 @@
 package fr.schnitchencsaba.apirest.database;
 
-import fr.schnitchencsaba.apirest.feature.database.DatabaseService;
-import fr.schnitchencsaba.apirest.feature.database.ProductDto;
-import fr.schnitchencsaba.apirest.feature.database.ProductDtoExtended;
+import fr.schnitchencsaba.apirest.feature.database.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -100,5 +100,23 @@ public class DatabaseTests {
             assertEquals(averageRating1, averageRating2);
         }
         logger.info("The ids, names, descriptions, prices, category names, review counts and average ratings of the products are equal.");
+    }
+
+    @Test
+    void testGetProductListFromEntity() {
+        Query query = entityManager.createNativeQuery("SELECT id, name, description, price from products;", Tuple.class);
+        List<Tuple> resultList = query.getResultList();
+        List<ProductWithPriceDto> productsWithPriceDto = resultList.stream().map(ProductWithPriceDto::new).toList();
+        List<Product> products = databaseService.getProductListFromEntity();
+        assert productsWithPriceDto.size() == products.size();
+        logger.info("The sizes of the product lists are equal.");
+        for (int i = 0; i < productsWithPriceDto.size(); i++) {
+            Assertions.assertTrue(testEquality(products.get(i), productsWithPriceDto.get(i)));
+        }
+        logger.info("The ids, names, descriptions and prices of the products are equal.");
+    }
+
+    boolean testEquality(Product product, ProductWithPriceDto productWithPriceDto) {
+        return product.getId() == productWithPriceDto.getId() && Objects.equals(product.getName(), productWithPriceDto.getName()) && Objects.equals(product.getDescription(), productWithPriceDto.getDescription()) && Objects.equals(product.getPrice(), productWithPriceDto.getPrice());
     }
 }
