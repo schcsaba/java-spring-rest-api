@@ -116,6 +116,28 @@ public class DatabaseTests {
         logger.info("The ids, names, descriptions and prices of the products are equal.");
     }
 
+    @Test
+    void testGetOneProduct() {
+        String request = "SELECT id, name, description, price FROM products WHERE id = :id";
+        Query query = entityManager.createNativeQuery(request, Tuple.class).setParameter("id", 1);
+        Tuple result = (Tuple) query.getSingleResult();
+        ProductWithPriceDto p1 = new ProductWithPriceDto(result);
+        ProductWithPriceDto p2 = databaseService.getOneProduct(1);
+        assert p1.equals(p2);
+        logger.info("The two products are equal.");
+    }
+
+    @Test
+    void testGetOneProductEntity() {
+        String request = "SELECT id, name, description, price FROM products WHERE id = :id";
+        Query query = entityManager.createNativeQuery(request, Tuple.class).setParameter("id", 1);
+        Tuple result = (Tuple) query.getSingleResult();
+        ProductWithPriceDto p1 = new ProductWithPriceDto(result);
+        Product p2 = databaseService.getOneProductEntity(1);
+        Assertions.assertTrue(testEquality(p2, p1));
+        logger.info("The two products are equal.");
+    }
+
     boolean testEquality(Product product, ProductWithPriceDto productWithPriceDto) {
         return product.getId() == productWithPriceDto.getId() && Objects.equals(product.getName(), productWithPriceDto.getName()) && Objects.equals(product.getDescription(), productWithPriceDto.getDescription()) && Objects.equals(product.getPrice(), productWithPriceDto.getPrice());
     }
