@@ -2,6 +2,8 @@ package fr.schnitchencsaba.apirest.feature.database;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "products")
 public class Product {
@@ -19,8 +21,15 @@ public class Product {
     @Column(name = "price")
     private int price;
 
-    @Column(name = "category_id")
-    private int categoryId;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @OneToMany(mappedBy = "product")
+    private List<OrderItem> orderItems;
+
+    @OneToMany(mappedBy = "product")
+    private List<Review> reviews;
 
     public int getId() {
         return id;
@@ -38,7 +47,15 @@ public class Product {
         return price;
     }
 
-    public int getCategoryId() {
-        return categoryId;
+    public Category getCategory() {
+        return category;
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
     }
 }
