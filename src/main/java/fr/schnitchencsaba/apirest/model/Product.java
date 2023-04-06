@@ -1,4 +1,4 @@
-package fr.schnitchencsaba.apirest.feature.database;
+package fr.schnitchencsaba.apirest.model;
 
 import jakarta.persistence.*;
 

@@ -1,6 +1,7 @@
 package fr.schnitchencsaba.apirest.database;
 
 import fr.schnitchencsaba.apirest.feature.database.*;
+import fr.schnitchencsaba.apirest.model.Product;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
