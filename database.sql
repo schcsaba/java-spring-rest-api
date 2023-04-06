@@ -25,17 +25,18 @@ INSERT INTO `orders` (`id`, `user_id`, `created_at`) VALUES
 	(1, 1, '2023-04-03 14:37:22'),
 	(2, 3, '2023-04-03 14:37:35');
 
--- Listage des données de la table shop.order_items : ~3 rows (environ)
+-- Listage des données de la table shop.order_items : ~2 rows (environ)
 INSERT INTO `order_items` (`id`, `product_id`, `amount`, `order_id`) VALUES
 	(1, 1, 1, 1),
 	(2, 2, 6, 1),
 	(3, 3, 1, 2);
 
--- Listage des données de la table shop.products : ~3 rows (environ)
+-- Listage des données de la table shop.products : ~4 rows (environ)
 INSERT INTO `products` (`id`, `name`, `description`, `price`, `category_id`) VALUES
 	(1, 'Book A', 'Very interesting book', 2400, 2),
 	(2, 'Croissant', 'bio, vegan croissant', 200, 1),
-	(3, 'MacBook Air', 'good performance', 150000, 3);
+	(3, 'MacBook Air', 'good performance', 150000, 3),
+	(4, 'Book B', 'A crime story', 2800, 2);
 
 -- Listage des données de la table shop.reviews : ~9 rows (environ)
 INSERT INTO `reviews` (`id`, `review`, `product_id`, `rating`) VALUES
@@ -49,7 +50,7 @@ INSERT INTO `reviews` (`id`, `review`, `product_id`, `rating`) VALUES
 	(9, 'Very small', 2, 6),
 	(10, 'Not very original', 1, 6);
 
--- Listage des données de la table shop.users : ~3 rows (environ)
+-- Listage des données de la table shop.users : ~2 rows (environ)
 INSERT INTO `users` (`id`, `first_name`, `last_name`, `email`) VALUES
 	(1, 'John', 'Doe', 'johndoe@email.com'),
 	(2, 'John', 'Smith', 'johnsmith@email.com'),

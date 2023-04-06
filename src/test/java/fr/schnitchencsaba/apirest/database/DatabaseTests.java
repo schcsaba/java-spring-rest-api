@@ -2,6 +2,7 @@ package fr.schnitchencsaba.apirest.database;
 
 import fr.schnitchencsaba.apirest.feature.database.*;
 import fr.schnitchencsaba.apirest.model.Product;
+import fr.schnitchencsaba.apirest.model.ProductRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
@@ -27,6 +28,9 @@ public class DatabaseTests {
 
     @Autowired
     DatabaseService databaseService;
+
+    @Autowired
+    ProductRepository productRepository;
 
     private final Logger logger = LoggerFactory.getLogger(DatabaseTests.class);
 
@@ -103,12 +107,16 @@ public class DatabaseTests {
         logger.info("The ids, names, descriptions, prices, category names, review counts and average ratings of the products are equal.");
     }
 
+    boolean testEquality(Product product, ProductWithPriceDto productWithPriceDto) {
+        return product.getId() == productWithPriceDto.getId() && Objects.equals(product.getName(), productWithPriceDto.getName()) && Objects.equals(product.getDescription(), productWithPriceDto.getDescription()) && Objects.equals(product.getPrice(), productWithPriceDto.getPrice());
+    }
+
     @Test
-    void testGetProductListFromEntity() {
+    void testGetProductEntityList() {
         Query query = entityManager.createNativeQuery("SELECT id, name, description, price from products;", Tuple.class);
         List<Tuple> resultList = query.getResultList();
         List<ProductWithPriceDto> productsWithPriceDto = resultList.stream().map(ProductWithPriceDto::new).toList();
-        List<Product> products = databaseService.getProductListFromEntity();
+        List<Product> products = databaseService.getProductEntityList();
         assert productsWithPriceDto.size() == products.size();
         logger.info("The sizes of the product lists are equal.");
         for (int i = 0; i < productsWithPriceDto.size(); i++) {
@@ -118,28 +126,78 @@ public class DatabaseTests {
     }
 
     @Test
-    void testGetOneProduct() {
+    void testGetOneProductById() {
         String request = "SELECT id, name, description, price FROM products WHERE id = :id";
         Query query = entityManager.createNativeQuery(request, Tuple.class).setParameter("id", 1);
         Tuple result = (Tuple) query.getSingleResult();
         ProductWithPriceDto p1 = new ProductWithPriceDto(result);
-        ProductWithPriceDto p2 = databaseService.getOneProduct(1);
+        ProductWithPriceDto p2 = databaseService.getOneProductById(1);
         assert p1.equals(p2);
         logger.info("The two products are equal.");
     }
 
     @Test
-    void testGetOneProductEntity() {
+    void testGetOneProductEntityById() {
         String request = "SELECT id, name, description, price FROM products WHERE id = :id";
         Query query = entityManager.createNativeQuery(request, Tuple.class).setParameter("id", 1);
         Tuple result = (Tuple) query.getSingleResult();
         ProductWithPriceDto p1 = new ProductWithPriceDto(result);
-        Product p2 = databaseService.getOneProductEntity(1);
+        Product p2 = databaseService.getOneProductEntityById(1);
         Assertions.assertTrue(testEquality(p2, p1));
         logger.info("The two products are equal.");
     }
 
-    boolean testEquality(Product product, ProductWithPriceDto productWithPriceDto) {
-        return product.getId() == productWithPriceDto.getId() && Objects.equals(product.getName(), productWithPriceDto.getName()) && Objects.equals(product.getDescription(), productWithPriceDto.getDescription()) && Objects.equals(product.getPrice(), productWithPriceDto.getPrice());
+    @Test
+    void testGetProductListByName() {
+        String request = "SELECT id, name, description, price FROM products WHERE name LIKE :name";
+        Query query = entityManager.createNativeQuery(request, Tuple.class).setParameter("name", "%" + "book" + "%");
+        List<Tuple> resultList = (List<Tuple>) query.getResultList();
+        List<ProductWithPriceDto> productList1 = resultList.stream().map(ProductWithPriceDto::new).toList();
+        List<ProductWithPriceDto> productList2 = databaseService.getProductListByName("book");
+        assert productList1.size() == productList2.size();
+        logger.info("The sizes of the product lists are equal.");
+        for (int i = 0; i < productList1.size(); i++) {
+            Assertions.assertEquals(productList1.get(i), productList2.get(i));
+        }
+        logger.info("The ids, names, descriptions and prices of the products are equal.");
+    }
+
+    @Test
+    void testGetProductEntityListByName() {
+        List<Product> productList1 = productRepository.findByNameContainingIgnoreCase("book");
+        List<Product> productList2 = databaseService.getProductEntityListByName("book");
+        assert productList1.size() == productList2.size();
+        logger.info("The sizes of the product lists are equal.");
+        for (int i = 0; i < productList1.size(); i++) {
+            assert productList1.get(i).equals(productList2.get(i));
+        }
+        logger.info("The ids, names, descriptions and prices of the products are equal.");
+    }
+
+    @Test
+    void testGetProductListByCategoryName() {
+        String request = "SELECT p.id, p.name, p.description, p.price FROM products p INNER JOIN categories c ON p.category_id = c.id WHERE c.name LIKE :categoryName";
+        Query query = entityManager.createNativeQuery(request, Tuple.class).setParameter("categoryName", "%" + "food" + "%");
+        List<Tuple> resultList = (List<Tuple>) query.getResultList();
+        List<ProductWithPriceDto> productList1 = resultList.stream().map(ProductWithPriceDto::new).toList();
+        List<ProductWithPriceDto> productList2 = databaseService.getProductListByCategoryName("food");
+        assert productList1.size() == productList2.size();
+        logger.info("The sizes of the product lists are equal.");
+        for (int i = 0; i < productList1.size(); i++) {
+            Assertions.assertEquals(productList1.get(i), productList2.get(i));
+        }
+        logger.info("The ids, names, descriptions and prices of the products are equal.");
+    }
+
+    @Test
+    void testGetProductEntityListByCategoryName() {
+        List<Product> productList1 = productRepository.findByCategoryName("food");
+        List<Product> productList2 = databaseService.getProductEntityListByCategoryName("food");
+        assert productList1.size() == productList2.size();
+        logger.info("The sizes of the product lists are equal.");
+        for (int i = 0; i < productList1.size(); i++) {
+            Assertions.assertEquals(productList1.get(i), productList2.get(i));
+        }
+        logger.info("The ids, names, descriptions and prices of the products are equal.");
     }
 }

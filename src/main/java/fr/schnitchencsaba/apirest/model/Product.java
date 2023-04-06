@@ -3,6 +3,7 @@ package fr.schnitchencsaba.apirest.model;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "products")
@@ -10,7 +11,7 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Integer id;
 
     @Column(name = "name")
     private String name;
@@ -19,10 +20,13 @@ public class Product {
     private String description;
 
     @Column(name = "price")
-    private int price;
+    private Integer price;
+
+    @Column(name = "category_id")
+    private Integer categoryId;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", updatable = false, insertable = false)
     private Category category;
 
     @OneToMany(mappedBy = "product")
@@ -31,7 +35,7 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<Review> reviews;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -43,8 +47,12 @@ public class Product {
         return description;
     }
 
-    public int getPrice() {
+    public Integer getPrice() {
         return price;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
     }
 
     public Category getCategory() {
@@ -57,5 +65,18 @@ public class Product {
 
     public List<Review> getReviews() {
         return reviews;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return id.equals(product.id) && name.equals(product.name) && description.equals(product.description) && price.equals(product.price) && Objects.equals(categoryId, product.categoryId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, price, categoryId);
     }
 }

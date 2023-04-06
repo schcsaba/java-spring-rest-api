@@ -37,18 +37,40 @@ public class DatabaseService {
         return resultList.stream().map(ProductDtoExtended::new).toList();
     }
 
-    public List<Product> getProductListFromEntity() {
+    public List<Product> getProductEntityList() {
         return productRepository.findAll();
     }
 
-    public ProductWithPriceDto getOneProduct(Integer id) {
+    public ProductWithPriceDto getOneProductById(Integer id) {
         String request = "SELECT id, name, description, price FROM products WHERE id = :id";
         Query query = entityManager.createNativeQuery(request, Tuple.class).setParameter("id", id);
         Tuple result = (Tuple) query.getSingleResult();
         return new ProductWithPriceDto(result);
     }
 
-    public Product getOneProductEntity(Integer id) {
+    public Product getOneProductEntityById(Integer id) {
         return productRepository.findById(id).orElse(null);
+    }
+
+    public List<ProductWithPriceDto> getProductListByName(String name) {
+        String request = "SELECT id, name, description, price FROM products WHERE name LIKE :name";
+        Query query = entityManager.createNativeQuery(request, Tuple.class).setParameter("name", "%" + name + "%");
+        List<Tuple> resultList = (List<Tuple>) query.getResultList();
+        return resultList.stream().map(ProductWithPriceDto::new).toList();
+    }
+
+    public List<Product> getProductEntityListByName(String name) {
+        return productRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    public List<ProductWithPriceDto> getProductListByCategoryName(String categoryName) {
+        String request = "SELECT p.id, p.name, p.description, p.price FROM products p INNER JOIN categories c ON p.category_id = c.id WHERE c.name LIKE :categoryName";
+        Query query = entityManager.createNativeQuery(request, Tuple.class).setParameter("categoryName", "%" + categoryName + "%");
+        List<Tuple> resultList = (List<Tuple>) query.getResultList();
+        return resultList.stream().map(ProductWithPriceDto::new).toList();
+    }
+
+    public List<Product> getProductEntityListByCategoryName(String categoryName) {
+        return productRepository.findByCategoryName(categoryName);
     }
 }
