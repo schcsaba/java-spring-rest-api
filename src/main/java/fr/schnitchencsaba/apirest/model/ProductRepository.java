@@ -10,4 +10,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     @Query("SELECT p FROM Product p WHERE p.category.name = ?1")
     List<Product> findByCategoryName(String categoryName);
+
+    Product findFirstByNameIgnoreCase(String name);
 }

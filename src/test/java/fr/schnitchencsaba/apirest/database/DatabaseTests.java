@@ -1,17 +1,28 @@
 package fr.schnitchencsaba.apirest.database;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.schnitchencsaba.apirest.feature.database.*;
+import fr.schnitchencsaba.apirest.feature.product.ProductService;
 import fr.schnitchencsaba.apirest.model.Product;
 import fr.schnitchencsaba.apirest.model.ProductRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,6 +32,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
 public class DatabaseTests {
 
     @Autowired
@@ -30,7 +43,13 @@ public class DatabaseTests {
     DatabaseService databaseService;
 
     @Autowired
+    ProductService productService;
+
+    @Autowired
     ProductRepository productRepository;
+
+    @Autowired
+    private MockMvc mockMvc;
 
     private final Logger logger = LoggerFactory.getLogger(DatabaseTests.class);
 
@@ -108,7 +127,7 @@ public class DatabaseTests {
     }
 
     boolean testEquality(Product product, ProductWithPriceDto productWithPriceDto) {
-        return product.getId() == productWithPriceDto.getId() && Objects.equals(product.getName(), productWithPriceDto.getName()) && Objects.equals(product.getDescription(), productWithPriceDto.getDescription()) && Objects.equals(product.getPrice(), productWithPriceDto.getPrice());
+        return Objects.equals(product.getId(), productWithPriceDto.getId()) && Objects.equals(product.getName(), productWithPriceDto.getName()) && Objects.equals(product.getDescription(), productWithPriceDto.getDescription()) && Objects.equals(product.getPrice(), productWithPriceDto.getPrice());
     }
 
     @Test
@@ -199,5 +218,34 @@ public class DatabaseTests {
             Assertions.assertEquals(productList1.get(i), productList2.get(i));
         }
         logger.info("The ids, names, descriptions and prices of the products are equal.");
+    }
+
+    @Test
+    void testInsertProduct() throws Exception {
+//        ProductWithPriceDto p1 = new ProductWithPriceDto(null, "Pain au chocolat", "A delicious French sweet bread", 200);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/product").content("""
+                {"name": "Pain au chocolat",
+                "description": "A delicious French sweet bread",
+                "price": 200,"categoryId": 1}""").contentType(MediaType.APPLICATION_JSON);
+        ResultMatcher resultStatus = MockMvcResultMatchers.status().isOk();
+//        ResultMatcher resultProductName = MockMvcResultMatchers.content().json(new ObjectMapper().writeValueAsString(p1));
+        JsonNode contentResponse = new ObjectMapper().readTree(mockMvc.perform(requestBuilder)
+                .andExpect(resultStatus)
+                .andReturn().getResponse().getContentAsString());
+        Assertions.assertEquals("Pain au chocolat", contentResponse.get("name").asText());
+    }
+
+    @Test
+    void testDeleteProduct() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/product/4");
+        ResultMatcher resultStatus = MockMvcResultMatchers.status().isOk();
+        mockMvc.perform(requestBuilder).andExpect(resultStatus);
+    }
+
+    @Test
+    void testDeleteProductByName() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/product?productName=Book B");
+        ResultMatcher resultStatus = MockMvcResultMatchers.status().isOk();
+        mockMvc.perform(requestBuilder).andExpect(resultStatus);
     }
 }

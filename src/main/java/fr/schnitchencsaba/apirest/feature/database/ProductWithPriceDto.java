@@ -6,18 +6,18 @@ import java.util.Objects;
 
 public class ProductWithPriceDto extends ProductDto {
 
-    private final int price;
-    public ProductWithPriceDto(int id, String name, String description, int price) {
+    private final Integer price;
+    public ProductWithPriceDto(Integer id, String name, String description, Integer price) {
         super(id, name, description);
         this.price = price;
     }
 
     public ProductWithPriceDto(Tuple productData) {
         super(productData);
-        this.price = (int) productData.get(3);
+        this.price = (Integer) productData.get(3);
     }
 
-    public int getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
@@ -27,7 +27,7 @@ public class ProductWithPriceDto extends ProductDto {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         ProductWithPriceDto that = (ProductWithPriceDto) o;
-        return price == that.price;
+        return price.equals(that.price);
     }
 
     @Override

@@ -12,7 +12,7 @@ public class ProductDtoExtended extends ProductWithPriceDto {
     private final Long reviewCount;
     private final BigDecimal averageRating;
 
-    public ProductDtoExtended(int id, String name, String description, int price, String categoryName, Long reviewCount, BigDecimal averageRating) {
+    public ProductDtoExtended(Integer id, String name, String description, Integer price, String categoryName, Long reviewCount, BigDecimal averageRating) {
         super(id, name, description, price);
         this.categoryName = categoryName;
         this.reviewCount = reviewCount;
