@@ -14,7 +14,10 @@ public class ProductController {
 
     @PostMapping("")
     public Product insertProduct(@RequestBody Product product) {
+        // GET produit.name == "table"
+        // SI listProduits IS NOT EMPTY
         ResponseEntity.status(HttpStatus.CONFLICT).body("A product with this name already exists.");
+        //
         return productService.insertProduct(product);
     }
 
