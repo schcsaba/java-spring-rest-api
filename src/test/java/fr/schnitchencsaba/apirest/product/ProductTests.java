@@ -1,4 +1,4 @@
-package fr.schnitchencsaba.apirest.database;
+package fr.schnitchencsaba.apirest.product;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class DatabaseTests {
+public class ProductTests {
 
     @Autowired
     private EntityManager entityManager;
@@ -57,7 +57,7 @@ public class DatabaseTests {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final Logger logger = LoggerFactory.getLogger(DatabaseTests.class);
+    private final Logger logger = LoggerFactory.getLogger(ProductTests.class);
 
     @Test
     void testGetProductNameList() {
