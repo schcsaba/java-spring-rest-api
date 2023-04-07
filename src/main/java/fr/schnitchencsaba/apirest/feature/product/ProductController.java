@@ -23,6 +23,15 @@ public class ProductController {
         }
     }
 
+    @PostMapping("/category-name")
+    public ResponseEntity<Product> insertProduct(@RequestBody ProductRequestWithCategoryName productRequestWithCategoryName) {
+        try {
+            return ResponseEntity.ok(productService.insertProduct(productRequestWithCategoryName));
+        } catch (ConstraintViolationException constraintViolationException) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+
     @DeleteMapping("/{productId}")
     public void deleteProduct(@PathVariable("productId") Integer productId) {
         productService.deleteProduct(productId);

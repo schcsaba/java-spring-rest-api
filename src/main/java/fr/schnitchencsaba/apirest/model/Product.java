@@ -78,6 +78,10 @@ public class Product {
         this.description = description;
     }
 
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+
     public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
     }

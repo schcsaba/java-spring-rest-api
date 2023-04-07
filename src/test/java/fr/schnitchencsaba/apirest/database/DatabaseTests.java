@@ -2,6 +2,7 @@ package fr.schnitchencsaba.apirest.database;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.schnitchencsaba.apirest.feature.category.CategoryService;
 import fr.schnitchencsaba.apirest.feature.database.*;
 import fr.schnitchencsaba.apirest.feature.product.ProductService;
 import fr.schnitchencsaba.apirest.model.Category;
@@ -243,22 +244,39 @@ public class DatabaseTests {
         Assertions.assertEquals("1", contentResponse.get("categoryId").asText());
     }
 
-//    @Test
-//    void testInsertProductWithCategoryName() throws Exception {
-//        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/product").content("""
-//                {"name": "Shovel",
-//                "description": "A useful tool in the garden",
-//                "price": 1000,"categoryName": "gardening"}""").contentType(MediaType.APPLICATION_JSON);
-//        ResultMatcher resultStatus = MockMvcResultMatchers.status().isOk();
-//        JsonNode contentResponse = new ObjectMapper().readTree(mockMvc.perform(requestBuilder)
-//                .andExpect(resultStatus)
-//                .andReturn().getResponse().getContentAsString());
-//        Assertions.assertEquals("Shovel", contentResponse.get("name").asText());
-//        Assertions.assertEquals("A useful tool in the garden", contentResponse.get("description").asText());
-//        Assertions.assertEquals("1000", contentResponse.get("price").asText());
-//        Category category = categoryService.getOneCategoryById(contentResponse.get("categoryId").asInt());
-//        Assertions.assertEquals("gardening", category.getName());
-//    }
+    @Test
+    void testInsertProductWithNonExistingCategoryName() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/product/category-name").content("""
+                {"name": "Shovel",
+                "description": "A useful tool in the garden",
+                "price": 1000,"categoryName": "gardening"}""").contentType(MediaType.APPLICATION_JSON);
+        ResultMatcher resultStatus = MockMvcResultMatchers.status().isOk();
+        JsonNode contentResponse = new ObjectMapper().readTree(mockMvc.perform(requestBuilder)
+                .andExpect(resultStatus)
+                .andReturn().getResponse().getContentAsString());
+        Assertions.assertEquals("Shovel", contentResponse.get("name").asText());
+        Assertions.assertEquals("A useful tool in the garden", contentResponse.get("description").asText());
+        Assertions.assertEquals("1000", contentResponse.get("price").asText());
+        Category category = categoryService.getOneCategoryById(contentResponse.get("categoryId").asInt());
+        Assertions.assertEquals("gardening", category.getName());
+    }
+
+    @Test
+    void testInsertProductWithExistingCategoryName() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/product/category-name").content("""
+                {"name": "Book D",
+                "description": "A horror story",
+                "price": 2000,"categoryName": "book"}""").contentType(MediaType.APPLICATION_JSON);
+        ResultMatcher resultStatus = MockMvcResultMatchers.status().isOk();
+        JsonNode contentResponse = new ObjectMapper().readTree(mockMvc.perform(requestBuilder)
+                .andExpect(resultStatus)
+                .andReturn().getResponse().getContentAsString());
+        Assertions.assertEquals("Book D", contentResponse.get("name").asText());
+        Assertions.assertEquals("A horror story", contentResponse.get("description").asText());
+        Assertions.assertEquals("2000", contentResponse.get("price").asText());
+        Category category = categoryService.getOneCategoryById(contentResponse.get("categoryId").asInt());
+        Assertions.assertEquals("book", category.getName());
+    }
 
     @Test
     void testDeleteProduct() throws Exception {

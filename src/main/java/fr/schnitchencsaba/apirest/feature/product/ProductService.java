@@ -1,5 +1,7 @@
 package fr.schnitchencsaba.apirest.feature.product;
 
+import fr.schnitchencsaba.apirest.feature.category.CategoryService;
+import fr.schnitchencsaba.apirest.model.Category;
 import fr.schnitchencsaba.apirest.model.Product;
 import fr.schnitchencsaba.apirest.model.ProductRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,11 +19,28 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CategoryService categoryService;
+
     public Product insertProduct(Product product) throws ConstraintViolationException {
         List<Product> byName = productRepository.findByNameContainingIgnoreCase(product.getName());
         if (byName.size() > 0) {
             throw new ConstraintViolationException("A product with the name " + product.getName() + " already exists", new SQLException(), "product::name INDEX UNIQUE");
         }
+        return productRepository.save(product);
+    }
+
+    public Product insertProduct(ProductRequestWithCategoryName productRequestWithCategoryName) {
+        List<Product> byName = productRepository.findByNameContainingIgnoreCase(productRequestWithCategoryName.getName());
+        if (byName.size() > 0) {
+            throw new ConstraintViolationException("A product with the name " + productRequestWithCategoryName.getName() + " already exists", new SQLException(), "product::name INDEX UNIQUE");
+        }
+        Category category = categoryService.findOrCreateCategoryByName(productRequestWithCategoryName.getCategoryName());
+        Product product = new Product();
+        product.setName(productRequestWithCategoryName.getName());
+        product.setDescription(productRequestWithCategoryName.getDescription());
+        product.setPrice(productRequestWithCategoryName.getPrice());
+        product.setCategoryId(category.getId());
         return productRepository.save(product);
     }
 

@@ -1,4 +1,4 @@
-package fr.schnitchencsaba.apirest.feature.database;
+package fr.schnitchencsaba.apirest.feature.category;
 
 import fr.schnitchencsaba.apirest.model.Category;
 import fr.schnitchencsaba.apirest.model.CategoryRepository;
@@ -22,7 +22,15 @@ public class CategoryService {
         return byId.get();
     }
 
-    public Category findFirstByNameIgnoreCase(String name) {
-        return categoryRepository.findFirstByNameIgnoreCase(name);
+    public Category findOrCreateCategoryByName(String name) {
+        Optional<Category> byName = categoryRepository.findByName(name);
+
+        if (byName.isPresent()) {
+            return byName.get();
+        } else {
+            Category category = new Category();
+            category.setName(name);
+            return categoryRepository.save(category);
+        }
     }
 }
