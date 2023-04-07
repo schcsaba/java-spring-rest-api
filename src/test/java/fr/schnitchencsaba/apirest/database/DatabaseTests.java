@@ -25,9 +25,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -50,6 +48,9 @@ public class DatabaseTests {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private final Logger logger = LoggerFactory.getLogger(DatabaseTests.class);
 
@@ -247,5 +248,57 @@ public class DatabaseTests {
         RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/product?productName=Book B");
         ResultMatcher resultStatus = MockMvcResultMatchers.status().isOk();
         mockMvc.perform(requestBuilder).andExpect(resultStatus);
+    }
+
+    @Test
+    void testUpdateProduct() throws Exception {
+        Assertions.assertNull(productService.getOneProductById(5).getCategoryId());
+        Map<String, String> listFields = new HashMap<>(){{
+            put("categoryId", "2");
+            put("name", "Casablanca");
+        }};
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put("/api/product/5")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(listFields));
+        ResultMatcher resultStatus = MockMvcResultMatchers.status().isOk();
+        JsonNode result = objectMapper.readTree(mockMvc.perform(requestBuilder)
+                .andExpect(resultStatus)
+                .andReturn().getResponse().getContentAsString());
+
+        Assertions.assertEquals(result.get("categoryId").asText(), listFields.get("categoryId"));
+        Assertions.assertEquals(result.get("name").asText(), listFields.get("name"));
+    }
+
+    @Test
+    void testUpdateProductWithWrongId() throws Exception {
+        Map<String, String> listFields = new HashMap<>(){{
+            put("categoryId", "2");
+            put("name", "Casablanca");
+        }};
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put("/api/product/10")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(listFields));
+        ResultMatcher resultStatus = MockMvcResultMatchers.status().isNotFound();
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(resultStatus);
+    }
+
+    @Test
+    void testUpdateProductWithExistingName() throws Exception {
+        Map<String, String> listFields = new HashMap<>(){{
+            put("categoryId", "2");
+            put("name", "Book B");
+        }};
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put("/api/product/5")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(listFields));
+        ResultMatcher resultStatus = MockMvcResultMatchers.status().isConflict();
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(resultStatus);
     }
 }

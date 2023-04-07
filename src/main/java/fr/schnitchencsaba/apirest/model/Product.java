@@ -70,6 +70,18 @@ public class Product {
         return reviews;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

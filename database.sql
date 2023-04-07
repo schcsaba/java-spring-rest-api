@@ -25,18 +25,19 @@ INSERT INTO `orders` (`id`, `user_id`, `created_at`) VALUES
 	(1, 1, '2023-04-03 14:37:22'),
 	(2, 3, '2023-04-03 14:37:35');
 
--- Listage des données de la table shop.order_items : ~2 rows (environ)
+-- Listage des données de la table shop.order_items : ~3 rows (environ)
 INSERT INTO `order_items` (`id`, `product_id`, `amount`, `order_id`) VALUES
 	(1, 1, 1, 1),
 	(2, 2, 6, 1),
 	(3, 3, 1, 2);
 
--- Listage des données de la table shop.products : ~4 rows (environ)
+-- Listage des données de la table shop.products : ~5 rows (environ)
 INSERT INTO `products` (`id`, `name`, `description`, `price`, `category_id`) VALUES
-	(1, 'Book A', 'Very interesting book', 2400, 2),
-	(2, 'Croissant', 'bio, vegan croissant', 200, 1),
-	(3, 'MacBook Air', 'good performance', 150000, 3),
-	(4, 'Book B', 'A crime story', 2800, 2);
+	(1, 'Book A', 'A very interesting book', 2400, 2),
+	(2, 'Croissant', 'Taste these delicious, bio and vegan croissants', 200, 1),
+	(3, 'MacBook Air', 'A high quality notebook', 150000, 3),
+	(4, 'Book B', 'A crime story', 2800, 2),
+	(5, 'Book C', 'A romantic story', 2600, NULL);
 
 -- Listage des données de la table shop.reviews : ~9 rows (environ)
 INSERT INTO `reviews` (`id`, `review`, `product_id`, `rating`) VALUES
