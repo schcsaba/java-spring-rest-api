@@ -15,12 +15,12 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping("")
-    public Product insertProduct(@RequestBody Product product) {
-        // GET produit.name == "table"
-        // SI listProduits IS NOT EMPTY
-        ResponseEntity.status(HttpStatus.CONFLICT).body("A product with this name already exists.");
-        //
-        return productService.insertProduct(product);
+    public ResponseEntity<Product> insertProduct(@RequestBody Product product) {
+        try {
+            return ResponseEntity.ok(productService.insertProduct(product));
+        } catch (ConstraintViolationException constraintViolationException) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
     @DeleteMapping("/{productId}")
@@ -40,7 +40,7 @@ public class ProductController {
             return ResponseEntity.ok(productService.updateProduct(productId, product));
         } catch (EntityNotFoundException entityNotFoundException) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (ConstraintViolationException constraintViolationException){
+        } catch (ConstraintViolationException constraintViolationException) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }

@@ -17,22 +17,34 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Product insertProduct(Product product) {
+    public Product insertProduct(Product product) throws ConstraintViolationException {
+        List<Product> byName = productRepository.findByNameContainingIgnoreCase(product.getName());
+        if (byName.size() > 0) {
+            throw new ConstraintViolationException("A product with the name " + product.getName() + " already exists", new SQLException(), "product::name INDEX UNIQUE");
+        }
         return productRepository.save(product);
     }
 
-    public void deleteProduct(Integer productId) {
+    public void deleteProduct(Integer productId) throws EntityNotFoundException {
+        Optional<Product> byId = productRepository.findById(productId);
+        if (byId.isEmpty()) {
+            throw new EntityNotFoundException("Product with ID %d does not exist".formatted(productId));
+        }
         productRepository.deleteById(productId);
     }
 
-    public Product findFirstByNameIgnoreCase(String name) {
-        return productRepository.findFirstByNameIgnoreCase(name);
+    public Product findFirstByNameIgnoreCase(String name) throws EntityNotFoundException {
+        Optional<Product> byName = productRepository.findFirstByNameIgnoreCase(name);
+        if (byName.isEmpty()) {
+            throw new EntityNotFoundException("Product with name %s does not exist".formatted(name));
+        }
+        return byName.get();
     }
 
     public Product updateProduct(Integer productId, Product product) throws EntityNotFoundException, ConstraintViolationException {
         Optional<Product> byId = productRepository.findById(productId);
         if (byId.isEmpty()) {
-            throw new EntityNotFoundException("Product with ID %d not exist".formatted(productId));
+            throw new EntityNotFoundException("Product with ID %d does not exist".formatted(productId));
         }
         List<Product> byName = productRepository.findByNameContainingIgnoreCase(product.getName()).stream().filter(p -> !Objects.equals(p.getId(), productId)).toList();
         if (byName.size() > 0) {
@@ -44,10 +56,10 @@ public class ProductService {
         return productRepository.save(foundProduct);
     }
 
-    public Product getOneProductById(Integer productId) {
+    public Product getOneProductById(Integer productId) throws EntityNotFoundException {
         Optional<Product> byId = productRepository.findById(productId);
         if (byId.isEmpty()) {
-            throw new EntityNotFoundException("Product with ID %d not exist".formatted(productId));
+            throw new EntityNotFoundException("Product with ID %d does not exist".formatted(productId));
         }
         return byId.get();
     }

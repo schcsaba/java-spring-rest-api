@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.schnitchencsaba.apirest.feature.database.*;
 import fr.schnitchencsaba.apirest.feature.product.ProductService;
+import fr.schnitchencsaba.apirest.model.Category;
 import fr.schnitchencsaba.apirest.model.Product;
 import fr.schnitchencsaba.apirest.model.ProductRepository;
 import jakarta.persistence.EntityManager;
@@ -42,6 +43,9 @@ public class DatabaseTests {
 
     @Autowired
     ProductService productService;
+
+    @Autowired
+    CategoryService categoryService;
 
     @Autowired
     ProductRepository productRepository;
@@ -234,7 +238,27 @@ public class DatabaseTests {
                 .andExpect(resultStatus)
                 .andReturn().getResponse().getContentAsString());
         Assertions.assertEquals("Pain au chocolat", contentResponse.get("name").asText());
+        Assertions.assertEquals("A delicious French sweet bread", contentResponse.get("description").asText());
+        Assertions.assertEquals("200", contentResponse.get("price").asText());
+        Assertions.assertEquals("1", contentResponse.get("categoryId").asText());
     }
+
+//    @Test
+//    void testInsertProductWithCategoryName() throws Exception {
+//        RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/product").content("""
+//                {"name": "Shovel",
+//                "description": "A useful tool in the garden",
+//                "price": 1000,"categoryName": "gardening"}""").contentType(MediaType.APPLICATION_JSON);
+//        ResultMatcher resultStatus = MockMvcResultMatchers.status().isOk();
+//        JsonNode contentResponse = new ObjectMapper().readTree(mockMvc.perform(requestBuilder)
+//                .andExpect(resultStatus)
+//                .andReturn().getResponse().getContentAsString());
+//        Assertions.assertEquals("Shovel", contentResponse.get("name").asText());
+//        Assertions.assertEquals("A useful tool in the garden", contentResponse.get("description").asText());
+//        Assertions.assertEquals("1000", contentResponse.get("price").asText());
+//        Category category = categoryService.getOneCategoryById(contentResponse.get("categoryId").asInt());
+//        Assertions.assertEquals("gardening", category.getName());
+//    }
 
     @Test
     void testDeleteProduct() throws Exception {
