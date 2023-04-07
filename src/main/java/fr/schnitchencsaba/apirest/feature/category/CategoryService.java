@@ -12,7 +12,7 @@ import java.util.Optional;
 public class CategoryService {
 
     @Autowired
-    CategoryRepository categoryRepository;
+    private CategoryRepository categoryRepository;
 
     public Category getOneCategoryById(Integer categoryId) {
         Optional<Category> byId = categoryRepository.findById(categoryId);

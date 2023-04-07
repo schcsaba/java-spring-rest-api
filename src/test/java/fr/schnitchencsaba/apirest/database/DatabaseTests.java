@@ -40,16 +40,16 @@ public class DatabaseTests {
     private EntityManager entityManager;
 
     @Autowired
-    DatabaseService databaseService;
+    private DatabaseService databaseService;
 
     @Autowired
-    ProductService productService;
+    private ProductService productService;
 
     @Autowired
-    CategoryService categoryService;
+    private CategoryService categoryService;
 
     @Autowired
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
 
     @Autowired
     private MockMvc mockMvc;
