@@ -30,7 +30,7 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public Product insertProduct(ProductRequestWithCategoryName productRequestWithCategoryName) {
+    public Product insertProduct(ProductRequestWithCategoryName productRequestWithCategoryName) throws ConstraintViolationException {
         List<Product> byName = productRepository.findByNameContainingIgnoreCase(productRequestWithCategoryName.getName());
         if (byName.size() > 0) {
             throw new ConstraintViolationException("A product with the name " + productRequestWithCategoryName.getName() + " already exists", new SQLException(), "product::name INDEX UNIQUE");
